@@ -22,8 +22,44 @@ const server = http.createServer((req, res) => {
         res.end();
 
     } else if (req.method === 'POST' && req.url.startsWith('/submit-details')) {
-        // This now matches even with / or ? in the URL
-        fs.writeFileSync('user-details.txt', 'Piyush Kumar - Male');
+       
+        //Reading Chunks
+        // req.on("data",(chunk) =>{
+        //     console.log(chunk);
+        // })
+        
+        //Buffering Chunks
+        // const body =[];
+        // req.on("data",(chunk) =>{
+        //     console.log(chunk);
+        //     body.push(chunk)
+        // });
+        // req.on("end",() =>{
+        //     const parsedBody = Buffer.concat(body).toString();
+        //     console.log(parsedBody);
+        // });
+
+        //Parsing Request
+        const body =[];
+        req.on("data",(chunk) =>{
+            console.log(chunk);
+            body.push(chunk)
+        });
+        req.on("end",() =>{
+            const parsedBody = Buffer.concat(body).toString();
+            console.log(parsedBody);
+
+            // Parsing Request
+            const param = new URLSearchParams(parsedBody);
+            const jsonObject = {};
+            for(const [key,value] of param.entries()){
+                jsonObject[key] = value;
+            }
+            const jsonString = JSON.stringify(jsonObject);
+            console.log(jsonString)
+            fs.writeFileSync('user-details.txt', 'Piyush Kumar - Male');
+        });
+
         console.log('✅ File written successfully!');
         res.statusCode = 302;
         res.setHeader('Location', '/');
